@@ -9,6 +9,7 @@ import blaster_utils as bu
 import random
 
 NUM_TARGETS = 50
+SPEED = 2
 BLACK = 0,0,0
 WHITE = 255,255,255
 RED = 200,0,0
@@ -88,9 +89,6 @@ while not done:
             bullet_list.remove(bullet)
             all_sprites_list.remove(bullet)
     
-                       
-    screen.fill(BLACK)
-    
     if(joystick_count != 0):
         horiz_axis_pos = my_joystick.get_axis(0)
         vert_axis_pos = my_joystick.get_axis(1)
@@ -104,8 +102,30 @@ while not done:
             player.rect.y += int(vert_axis_pos*5)
         if player.rect.y > screen_height - 100 and vert_axis_pos < 0:
             player.rect.y += int(vert_axis_pos*5)
-    
+    else:
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                player.vy = SPEED
+            if event.key == pygame.K_UP:
+                player.vy = -SPEED
+            if event.key == pygame.K_LEFT:
+                player.vx = -SPEED
+            if event.key == pygame.K_RIGHT:
+                player.vx = SPEED
 
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_DOWN:
+                player.vy = 0
+            if event.key == pygame.K_UP:
+                player.vy = 0
+            if event.key == pygame.K_LEFT:
+                player.vx = 0
+            if event.key == pygame.K_RIGHT:
+                player.vx = 0
+
+        player.update(screen_width,screen_height)
+    
+    screen.fill(BLACK)
     all_sprites_list.draw(screen)
     
     clock.tick(60)    

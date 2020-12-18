@@ -15,6 +15,13 @@ class Block(pygame.sprite.Sprite):
         self.image = pygame.Surface([width,height])
         self.image.fill(color)
         self.rect = self.image.get_rect()
+        self.vx = 0
+        self.vy = 0
+
+    def update(self):
+        self.rect.x += self.vx
+        self.rect.y += self.vy
+        
 
 class Ship(pygame.sprite.Sprite):
     
@@ -25,6 +32,19 @@ class Ship(pygame.sprite.Sprite):
 #        raw_image = pygame.image.load("images/ship.png")
         self.image = pygame.transform.scale(raw_image,(32,32))        
         self.rect = self.image.get_rect()
+        self.vx = 0
+        self.vy = 0
+
+    def update(self,screen_width,screen_height):
+        if self.rect.x > 3 and self.vx < 0:
+            self.rect.x += self.vx
+        if self.rect.x < screen_width - 32 and self.vx > 0:
+            self.rect.x += self.vx
+        if self.rect.y < screen_height - 36 and self.vy > 0:
+            self.rect.y += self.vy
+        if self.rect.y > screen_height - 100 and self.vy < 0:
+            self.rect.y += self.vy
+        
 
 class Bullet(pygame.sprite.Sprite):
 
@@ -34,6 +54,13 @@ class Bullet(pygame.sprite.Sprite):
         self.image = pygame.Surface([3,10])
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
+        self.vx = 0
+        self.vy = 0
+
+    def update(self):
+        self.rect.x += self.vx
+        self.rect.y += self.vy
+        
 
 
 class SpriteSheet(object):
@@ -47,5 +74,5 @@ class SpriteSheet(object):
 
         image = pygame.Surface([width,height])
         image.blit(self.sprite_sheet,(0,0),(x,y,width,height))
-
+        image.set_colorkey((0,0,0))
         return image
