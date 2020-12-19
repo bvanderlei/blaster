@@ -48,7 +48,7 @@ for i in range(NUM_TARGETS):
     block_list.add(target)
     all_sprites_list.add(target)
 
-ship_sheet = bu.SpriteSheet("images/ship_ani.png")
+ship_sheet = bu.SpriteSheet("images/Blaster_Ship.png")
 
 player = bu.Ship(ship_sheet)
 all_sprites_list.add(player)
@@ -112,6 +112,13 @@ while not done:
                 player.vx = -SPEED
             if event.key == pygame.K_RIGHT:
                 player.vx = SPEED
+            if event.key == pygame.K_SPACE:
+                bullet = bu.Bullet()
+                bullet.rect.x = player.rect.x+14
+                bullet.rect.y = player.rect.y
+
+                all_sprites_list.add(bullet)
+                bullet_list.add(bullet)
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
@@ -128,7 +135,7 @@ while not done:
     screen.fill(BLACK)
     all_sprites_list.draw(screen)
     
-    clock.tick(60)    
+    clock.tick(40)    
     pygame.display.flip()
     
 pygame.quit()
