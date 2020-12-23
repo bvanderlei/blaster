@@ -24,6 +24,8 @@ screen = pygame.display.set_mode([screen_width,screen_height])
 pygame.display.set_caption("Rock Blaster")
 font = pygame.font.SysFont('Calibri',25,True,False)
 
+shoot_sound = pygame.mixer.Sound("sounds/laser.ogg")
+
 joystick_count = pygame.joystick.get_count()
 if joystick_count == 0:
     print("Joystick not detected!")
@@ -53,6 +55,7 @@ ship_sheet = bu.SpriteSheet("images/Blaster_Ship.png")
 player = bu.Ship(ship_sheet)
 all_sprites_list.add(player)
 
+
 done = False
 clock  = pygame.time.Clock()
 score = 0
@@ -74,10 +77,11 @@ while not done:
                 bullet = bu.Bullet()
                 bullet.rect.x = player.rect.x+14
                 bullet.rect.y = player.rect.y
-
                 all_sprites_list.add(bullet)
                 bullet_list.add(bullet)
-
+                shoot_sound.play()
+                player.blast = True
+                
     if(joystick_count != 0):
         horiz_axis_pos = my_joystick.get_axis(0)
         vert_axis_pos = my_joystick.get_axis(1)
@@ -172,7 +176,10 @@ while not done:
 
     score_msg = font.render("SCORE:  "+str(score),True,WHITE)
     screen.blit(score_msg,[16,16])         
-    
+    if (player.blast):
+        pygame.draw.circle(screen,YELLOW,[player.rect.x+16,player.rect.y],10)
+        player.blast = False
+        
     clock.tick(60)    
     pygame.display.flip()
     

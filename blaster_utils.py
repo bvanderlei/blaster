@@ -77,6 +77,7 @@ class Ship(pygame.sprite.Sprite):
         self.vy = 0
 
         self.tick = 0
+        self.blast = False
         
     def update(self,screen_width,screen_height):
         if self.rect.x > 3 and self.vx < 0:
