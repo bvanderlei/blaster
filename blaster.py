@@ -8,7 +8,7 @@ import pygame
 import blaster_utils as bu
 import random
 
-NUM_TARGETS = 50
+NUM_ROCKS = 50
 SPEED = 2
 BLACK = 0,0,0
 WHITE = 255,255,255
@@ -32,22 +32,21 @@ else:
     my_joystick.init()
         
 
-block_list = pygame.sprite.Group()
+rock_list = pygame.sprite.Group()
 bullet_list = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
 
 rock_sheet = bu.SpriteSheet("images/rock_ani.png")
-rock_image = rock_sheet.get_image(0,0,16,16)
+#rock_image = rock_sheet.get_image(0,0,16,16)
 
-for i in range(NUM_TARGETS):
-    target = bu.Block(RED,20,20)
-    target.image = rock_image
-    target.rect.x = random.randrange(8,screen_width-8)
-    target.rect.y = random.randrange(0,screen_height-100)
+for i in range(NUM_ROCKS):
+    rock = bu.Rock(rock_sheet)
+    rock.rect.x = random.randrange(8,screen_width-8)
+    rock.rect.y = random.randrange(0,screen_height-100)
     
-    block_list.add(target)
-    all_sprites_list.add(target)
+    rock_list.add(rock)
+    all_sprites_list.add(rock)
 
 ship_sheet = bu.SpriteSheet("images/Blaster_Ship.png")
 
@@ -61,6 +60,11 @@ player.rect.x = 100
 player.rect.y = screen_height-100
 
 while not done:
+
+
+    ###############################################################        
+    # HANDLE EVENTS
+    ###############################################################        
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -74,21 +78,6 @@ while not done:
                 all_sprites_list.add(bullet)
                 bullet_list.add(bullet)
 
-    # Update the bullets:
-    for bullet in bullet_list:
-        bullet.rect.y -= 3
-        # Check for hits
-        hit_list = pygame.sprite.spritecollide(bullet,block_list,True)
-
-        for block in hit_list:
-            bullet_list.remove(bullet)
-            all_sprites_list.remove(bullet)
-            score += 1
-
-        if bullet.rect.y < -10:
-            bullet_list.remove(bullet)
-            all_sprites_list.remove(bullet)
-    
     if(joystick_count != 0):
         horiz_axis_pos = my_joystick.get_axis(0)
         vert_axis_pos = my_joystick.get_axis(1)
@@ -130,8 +119,54 @@ while not done:
             if event.key == pygame.K_RIGHT:
                 player.vx = 0
 
-        player.update(screen_width,screen_height)
+    ###############################################################        
+    # UPDATE GAME STATUS
+    ###############################################################        
+                
+    # Update the bullets:
+    for bullet in bullet_list:
+        bullet.rect.y -= 3
+        # Check for hits
+        hit_list = pygame.sprite.spritecollide(bullet,rock_list,True)
+        
+        for rock in hit_list:
+            bullet_list.remove(bullet)
+            all_sprites_list.remove(bullet)
+            all_sprites_list.remove(rock)
+            score += 1
+            #Create a new rock
+            new_rock = bu.Rock(rock_sheet)
+            new_rock.rect.x = random.randrange(8,screen_width-8)
+            new_rock.rect.y = -16
     
+            rock_list.add(new_rock)
+            all_sprites_list.add(new_rock)
+            
+            
+        if bullet.rect.y < -10:
+            bullet_list.remove(bullet)
+            all_sprites_list.remove(bullet)
+    
+
+                
+    player.update(screen_width,screen_height)
+    for rock in rock_list:
+        rock.update(screen_width,screen_height)
+        if rock.rect.y > screen_height:
+            rock_list.remove(rock)
+            all_sprites_list.remove(rock)
+            #Create a new rock
+            new_rock = bu.Rock(rock_sheet)
+            new_rock.rect.x = random.randrange(8,screen_width-8)
+            new_rock.rect.y = -16
+    
+            rock_list.add(new_rock)
+            all_sprites_list.add(new_rock)
+
+    ###############################################################        
+    # DRAW NEW FRAME 
+    ###############################################################        
+
     screen.fill(BLACK)
     all_sprites_list.draw(screen)
 

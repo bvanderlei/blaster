@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tues Dec 15 17:12:35 2020
-
+s
 @author: Ben Vanderlei
 """
 
 import pygame
-
+import random
 
 WHITE = 255,255,255
 
@@ -25,8 +25,39 @@ class Block(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.vx
         self.rect.y += self.vy
-        
 
+class Rock(pygame.sprite.Sprite):
+
+    def __init__(self,sheet):
+        super().__init__()
+
+        self.images = []
+        self.images.append(sheet.get_image(0,0,16,16))
+        self.images.append(sheet.get_image(0,16,16,16))
+        self.images.append(sheet.get_image(0,32,16,16))
+        self.images.append(sheet.get_image(0,48,16,16))        
+
+        self.frames = len(self.images)
+        self.index = random.randint(0,self.frames-1)
+        
+        self.image = self.images[self.index]
+        self.rect = self.image.get_rect()
+        self.vx = random.randint(-1,1)
+        self.vy = 1
+
+        self.tick = 0
+        
+    def update(self,screen_width,screen_height):
+        self.rect.x += self.vx
+        self.rect.y += self.vy
+        
+        self.tick += 1
+        if (self.tick == 5):
+            self.tick = 0
+            self.index = (self.index+1)%self.frames
+            self.image = self.images[self.index]
+        
+        
 class Ship(pygame.sprite.Sprite):
     
     def __init__(self,sheet):
