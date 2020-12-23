@@ -22,6 +22,7 @@ screen_width = 1200
 screen_height = 600
 screen = pygame.display.set_mode([screen_width,screen_height])
 pygame.display.set_caption("Rock Blaster")
+font = pygame.font.SysFont('Calibri',25,True,False)
 
 joystick_count = pygame.joystick.get_count()
 if joystick_count == 0:
@@ -42,8 +43,8 @@ rock_image = rock_sheet.get_image(0,0,16,16)
 for i in range(NUM_TARGETS):
     target = bu.Block(RED,20,20)
     target.image = rock_image
-    target.rect.x = random.randrange(0,screen_width)
-    target.rect.y = random.randrange(0,screen_height-50)
+    target.rect.x = random.randrange(8,screen_width-8)
+    target.rect.y = random.randrange(0,screen_height-100)
     
     block_list.add(target)
     all_sprites_list.add(target)
@@ -83,7 +84,6 @@ while not done:
             bullet_list.remove(bullet)
             all_sprites_list.remove(bullet)
             score += 1
-            print(score)
 
         if bullet.rect.y < -10:
             bullet_list.remove(bullet)
@@ -134,8 +134,11 @@ while not done:
     
     screen.fill(BLACK)
     all_sprites_list.draw(screen)
+
+    score_msg = font.render("SCORE:  "+str(score),True,WHITE)
+    screen.blit(score_msg,[16,16])         
     
-    clock.tick(40)    
+    clock.tick(60)    
     pygame.display.flip()
     
 pygame.quit()

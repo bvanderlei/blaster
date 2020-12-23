@@ -32,9 +32,6 @@ class Ship(pygame.sprite.Sprite):
     def __init__(self,sheet):
         super().__init__()
 
-        raw_image = sheet.get_image(0,0,32,32)
-#        raw_image = pygame.image.load("images/ship.png")
-#        self.image = pygame.transform.scale(raw_image,(32,32))        
         self.images = []
         self.images.append(sheet.get_image(0,0,32,32))
         self.images.append(sheet.get_image(0,32,32,32))
@@ -48,6 +45,8 @@ class Ship(pygame.sprite.Sprite):
         self.vx = 0
         self.vy = 0
 
+        self.tick = 0
+        
     def update(self,screen_width,screen_height):
         if self.rect.x > 3 and self.vx < 0:
             self.rect.x += self.vx
@@ -58,8 +57,11 @@ class Ship(pygame.sprite.Sprite):
         if self.rect.y > screen_height - 100 and self.vy < 0:
             self.rect.y += self.vy
         
-        self.index = (self.index+1)%self.frames
-        self.image = self.images[self.index]
+        self.tick += 1
+        if (self.tick == 3):
+            self.tick = 0
+            self.index = (self.index+1)%self.frames
+            self.image = self.images[self.index]
 
 class Bullet(pygame.sprite.Sprite):
 
