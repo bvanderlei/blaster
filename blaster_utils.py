@@ -42,7 +42,8 @@ class Rock(pygame.sprite.Sprite):
         
         self.image = self.images[self.index]
         self.rect = self.image.get_rect()
-        self.vx = random.randint(-1,1)
+#        self.vx = random.randint(-1,1)
+        self.vx = 0
         self.vy = 1
 
         self.tick = 0
