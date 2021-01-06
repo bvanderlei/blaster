@@ -44,7 +44,7 @@ class Rock(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 #        self.vx = random.randint(-1,1)
         self.vx = 0
-        self.vy = 1
+        self.vy = 2
 
         self.tick = 0
         
@@ -111,6 +111,16 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.x += self.vx
         self.rect.y += self.vy
         
+class Star():
+
+    def __init__(self,x,y,size,color):
+        self.x = x
+        self.y = y
+        self.size = size
+        self.color = color
+
+    def update(self):
+        self.y += 1
 
 
 class SpriteSheet(object):

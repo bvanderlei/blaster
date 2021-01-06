@@ -20,6 +20,8 @@ BGCOLOR = BLACK
 
 ## Game parameters
 NUM_ROCKS = 50
+NUM_STARS = 100
+MAX_STAR_RADIUS = 3
 SPEED = 2
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 600
@@ -50,15 +52,18 @@ def runGame():
 
     status_msg = GAMEFONT.render("STATUS",True,WHITE)
     status_bar = pygame.Rect(96,16+4,54,10)
-
     shoot_sound = pygame.mixer.Sound("sounds/laser.ogg")
+    collision_sound = pygame.mixer.Sound("sounds/collision_sound.ogg")
+    ship_sound = pygame.mixer.music.load("sounds/ship_sound.ogg")
+    pygame.mixer.music.set_endevent(pygame.USEREVENT)
 
-
+    pygame.mixer.music.play(loops = -1)
+    
     rock_list = pygame.sprite.Group()
     bullet_list = pygame.sprite.Group()
     all_sprites_list = pygame.sprite.Group()
-
-
+    star_list = []
+    
     rock_sheet = bu.SpriteSheet("images/rock_ani.png")
     #rock_image = rock_sheet.get_image(0,0,16,16)
 
@@ -70,6 +75,16 @@ def runGame():
         rock_list.add(rock)
         all_sprites_list.add(rock)
 
+    for i in range(NUM_STARS):
+        x = random.randrange(0,SCREEN_WIDTH)
+        y = random.randrange(0,SCREEN_HEIGHT)
+        size = random.randrange(1,MAX_STAR_RADIUS)
+        random_brightness = random.randrange(50,200)
+        color = (random_brightness,random_brightness,random.randrange(50,200))
+        new_star = bu.Star(x,y,size,color)
+        star_list.append(new_star)
+        
+        
     ship_sheet = bu.SpriteSheet("images/Blaster_Ship.png")
 
     player = bu.Ship(ship_sheet)
@@ -173,7 +188,9 @@ def runGame():
         for rock in ship_hit_list:
             all_sprites_list.remove(rock)
             health -= 1
+            collision_sound.play()
             if health == 0:
+                pygame.mixer.music.stop()
                 return
             #Create a new rock
             new_rock = bu.Rock(rock_sheet)
@@ -181,6 +198,7 @@ def runGame():
             new_rock.rect.y = -16
 
         player.update(SCREEN_WIDTH,SCREEN_HEIGHT)
+
         for rock in rock_list:
             rock.update(SCREEN_WIDTH,SCREEN_HEIGHT)
             if rock.rect.y > SCREEN_HEIGHT:
@@ -199,6 +217,26 @@ def runGame():
         ###############################################################        
 
         SCREEN.fill(BLACK)
+
+        new_stars_needed = []
+        for star in star_list:
+            pygame.draw.circle(SCREEN,star.color,[star.x,star.y],star.size)
+            star.update()
+            ## Reset star when it reaches bottom of screen
+            if star.y > SCREEN_HEIGHT:
+                new_stars_needed.append(star)
+
+        for star in new_stars_needed:
+            star_list.remove(star)
+        for star in new_stars_needed:
+            brightness = random.randrange(50,200)
+            x = random.randrange(0,SCREEN_WIDTH)
+            y = 0
+            size = random.randrange(1,MAX_STAR_RADIUS)
+            color = (brightness,brightness,random.randrange(50,200))
+            new_star = bu.Star(x,y,size,color)
+            star_list.append(new_star)
+            
         all_sprites_list.draw(SCREEN)
 
         score_msg = GAMEFONT.render("SCORE  "+str(score),True,WHITE)
