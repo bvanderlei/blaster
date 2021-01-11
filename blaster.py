@@ -60,18 +60,20 @@ def runGame():
     pygame.mixer.music.play(loops = -1)
     
     rock_list = pygame.sprite.Group()
+    broken_rock_list = pygame.sprite.Group()
     bullet_list = pygame.sprite.Group()
     all_sprites_list = pygame.sprite.Group()
     star_list = []
     
-    rock_sheet = bu.SpriteSheet("images/rock_ani.png")
+    rock_sheet = bu.SpriteSheet("images/rock_ani2.png")
     #rock_image = rock_sheet.get_image(0,0,16,16)
 
     for i in range(NUM_ROCKS):
         rock = bu.Rock(rock_sheet)
         rock.rect.x = random.randrange(8,SCREEN_WIDTH-8)
         rock.rect.y = random.randrange(0,SCREEN_HEIGHT-100)
-
+        if random.random() > 0.7:
+            rock.vx = random.randint(-1,1)
         rock_list.add(rock)
         all_sprites_list.add(rock)
 
@@ -79,8 +81,8 @@ def runGame():
         x = random.randrange(0,SCREEN_WIDTH)
         y = random.randrange(0,SCREEN_HEIGHT)
         size = random.randrange(1,MAX_STAR_RADIUS)
-        random_brightness = random.randrange(50,200)
-        color = (random_brightness,random_brightness,random.randrange(50,200))
+        brightness = random.randrange(50,200)
+        color = (brightness,brightness,random.randrange(50,100))
         new_star = bu.Star(x,y,size,color)
         star_list.append(new_star)
         
@@ -92,7 +94,7 @@ def runGame():
 
     clock  = pygame.time.Clock()
     score = 0
-    health = 5
+    health = 25
     player.rect.x = 100
     player.rect.y = SCREEN_HEIGHT-100
 
@@ -171,31 +173,40 @@ def runGame():
                 all_sprites_list.remove(bullet)
                 all_sprites_list.remove(rock)
                 score += 1
-                #Create a new rock
-                new_rock = bu.Rock(rock_sheet)
-                new_rock.rect.x = random.randrange(8,SCREEN_WIDTH-8)
-                new_rock.rect.y = -16
+                new_broken_rock = bu.BrokenRock(rock_sheet)
+                new_broken_rock.rect.x = rock.rect.x
+                new_broken_rock.rect.y = rock.rect.y
+                new_broken_rock.vx = rock.vx
 
-                rock_list.add(new_rock)
-                all_sprites_list.add(new_rock)
+                broken_rock_list.add(new_broken_rock)
+                all_sprites_list.add(new_broken_rock)
+                #Create a new rock
+                # new_rock = bu.Rock(rock_sheet)
+                # new_rock.rect.x = random.randrange(8,SCREEN_WIDTH-8)
+                # new_rock.rect.y = -16
+                # if random.random() > 0.7:
+                #     new_rock.vx = random.randint(-1,1)
+                # rock_list.add(new_rock)
+                # all_sprites_list.add(new_rock)
 
 
             if bullet.rect.y < -10:
                 bullet_list.remove(bullet)
                 all_sprites_list.remove(bullet)
-
+                
         ship_hit_list = pygame.sprite.spritecollide(player,rock_list,True)
         for rock in ship_hit_list:
             all_sprites_list.remove(rock)
             health -= 1
+            player.hit = True
             collision_sound.play()
             if health == 0:
                 pygame.mixer.music.stop()
                 return
             #Create a new rock
-            new_rock = bu.Rock(rock_sheet)
-            new_rock.rect.x = random.randrange(8,SCREEN_WIDTH-8)
-            new_rock.rect.y = -16
+            # new_rock = bu.Rock(rock_sheet)
+            # new_rock.rect.x = random.randrange(8,SCREEN_WIDTH-8)
+            # new_rock.rect.y = -16
 
         player.update(SCREEN_WIDTH,SCREEN_HEIGHT)
 
@@ -208,10 +219,25 @@ def runGame():
                 new_rock = bu.Rock(rock_sheet)
                 new_rock.rect.x = random.randrange(8,SCREEN_WIDTH-8)
                 new_rock.rect.y = -16
-
+                if random.random() > 0.7:
+                    new_rock.vx = random.randint(-1,1)
                 rock_list.add(new_rock)
                 all_sprites_list.add(new_rock)
 
+        for rock in broken_rock_list:
+            if rock.status == 0:
+                broken_rock_list.remove(rock)
+                all_sprites_list.remove(rock)
+                #Create a new rock
+                new_rock = bu.Rock(rock_sheet)
+                new_rock.rect.x = random.randrange(8,SCREEN_WIDTH-8)
+                new_rock.rect.y = -16
+                if random.random() > 0.7:
+                    new_rock.vx = random.randint(-1,1)
+                rock_list.add(new_rock)
+                all_sprites_list.add(new_rock)
+            else:
+                rock.update()
         ###############################################################        
         # DRAW NEW FRAME 
         ###############################################################        
@@ -233,7 +259,7 @@ def runGame():
             x = random.randrange(0,SCREEN_WIDTH)
             y = 0
             size = random.randrange(1,MAX_STAR_RADIUS)
-            color = (brightness,brightness,random.randrange(50,200))
+            color = (brightness,brightness,random.randrange(50,100))
             new_star = bu.Star(x,y,size,color)
             star_list.append(new_star)
             
@@ -250,6 +276,10 @@ def runGame():
         if (player.blast):
             pygame.draw.circle(SCREEN,YELLOW,[player.rect.x+16,player.rect.y],10)
             player.blast = False
+
+        if (player.hit):
+            pygame.draw.circle(SCREEN,RED,[player.rect.x+16,player.rect.y],20)
+            player.hit = False
 
         clock.tick(60)    
         pygame.display.flip()

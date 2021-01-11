@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tues Dec 15 17:12:35 2020
-s
+
 @author: Ben Vanderlei
 """
 
@@ -33,16 +33,17 @@ class Rock(pygame.sprite.Sprite):
 
         self.images = []
         self.images.append(sheet.get_image(0,0,16,16))
-        self.images.append(sheet.get_image(0,16,16,16))
-        self.images.append(sheet.get_image(0,32,16,16))
-        self.images.append(sheet.get_image(0,48,16,16))        
-
-        self.frames = len(self.images)
+        self.images.append(sheet.get_image(16,0,16,16))
+        self.images.append(sheet.get_image(32,0,16,16))
+        self.images.append(sheet.get_image(48,0,16,16))        
+        self.images.append(sheet.get_image(64,0,16,16))
+        
+        self.frames = 5
         self.index = random.randint(0,self.frames-1)
         
         self.image = self.images[self.index]
         self.rect = self.image.get_rect()
-#        self.vx = random.randint(-1,1)
+
         self.vx = 0
         self.vy = 2
 
@@ -53,10 +54,47 @@ class Rock(pygame.sprite.Sprite):
         self.rect.y += self.vy
         
         self.tick += 1
-        if (self.tick == 5):
+        if (self.tick == 8):
             self.tick = 0
             self.index = (self.index+1)%self.frames
             self.image = self.images[self.index]
+        
+class BrokenRock(pygame.sprite.Sprite):
+
+    def __init__(self,sheet):
+        super().__init__()
+
+        self.images = []
+        self.images.append(sheet.get_image(0,16,16,16))
+        self.images.append(sheet.get_image(16,16,16,16))
+        self.images.append(sheet.get_image(32,16,16,16))
+        self.images.append(sheet.get_image(48,16,16,16))        
+        self.images.append(sheet.get_image(64,16,16,16))
+        
+        self.frames = 5
+        self.index = 0
+        self.status = 1
+        
+        self.image = self.images[self.index]
+        self.rect = self.image.get_rect()
+
+        self.vx = 0
+        self.vy = 2
+
+        self.tick = 0
+        
+    def update(self):
+        if(self.index == 4):
+            self.status = 0
+        else:
+            self.rect.x += self.vx
+            self.rect.y += self.vy
+
+            self.tick += 1
+            if (self.tick == 2):
+                self.tick = 0
+                self.index = (self.index+1)
+                self.image = self.images[self.index]
         
         
 class Ship(pygame.sprite.Sprite):
@@ -79,6 +117,7 @@ class Ship(pygame.sprite.Sprite):
 
         self.tick = 0
         self.blast = False
+        self.hit = False
         
     def update(self,screen_width,screen_height):
         if self.rect.x > 3 and self.vx < 0:
